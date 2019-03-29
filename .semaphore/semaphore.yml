@@ -1,0 +1,18 @@
+version: v1.0
+name: Scal8 Pipeline
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+blocks:
+  - name: "Tests"
+    task:
+      env_vars:
+        - name: SCALA_VERSION
+          value: "2.12.8"
+      jobs:
+        - name: SBT Test
+          commands:
+            - sem-version scala 2.12
+            - checkout
+            - sbt test
