@@ -11,13 +11,11 @@ class UByte private (value: Byte = 0) extends Ordered[UByte] {
     thisValue.compare(thatValue)
   }
 
-  override def equals(obj: Any): Boolean = {
-    obj match {
-      case byte: UByte =>
-        value.equals(byte.getValue)
-      case _ =>
-        false
-    }
+  override def equals(obj: Any): Boolean = obj match {
+    case byte: UByte =>
+      value.equals(byte.getValue)
+    case _ =>
+      false
   }
 
   override def toString: String = f"0x$value%02x"
