@@ -12,7 +12,6 @@ class Cpu(memory: Memory, graphicMemory: GraphicMemory, keyDispatcher: KeyDispat
   def tick(): Unit = {
     val opCode = getNextOpCode
     executeOpCode(opCode)
-
   }
 
   def clockTick(): Unit = {
@@ -29,25 +28,11 @@ class Cpu(memory: Memory, graphicMemory: GraphicMemory, keyDispatcher: KeyDispat
     ((firstPart | secondPart).toShort & 0x0000FFFF).toShort
   }
 
-  private def advanceProgramCounter(): Unit = {
-    programCounter = (programCounter + 2).toShort
-  }
-
-  private def getOpCodeAddressValue(opCode: Short) = {
-    (opCode & 0x0FFF).toShort
-  }
-
-  private def getOpCodeXRegisterNumber(opCode: Short): Byte = {
-    ((opCode & 0x0F00) >>> 8).toByte
-  }
-
-  private def getOpCodeYRegisterNumber(opCode: Short): Byte = {
-    ((opCode & 0x00F0) >>> 4).toByte
-  }
-
-  private def getOpCodeValue(opCode: Short): UByte = {
-    UByte.of((opCode & 0x00FF).toByte)
-  }
+  private def advanceProgramCounter(): Unit                 = programCounter = (programCounter + 2).toShort
+  private def getOpCodeAddressValue(opCode: Short)          = (opCode & 0x0FFF).toShort
+  private def getOpCodeXRegisterNumber(opCode: Short): Byte = ((opCode & 0x0F00) >>> 8).toByte
+  private def getOpCodeYRegisterNumber(opCode: Short): Byte = ((opCode & 0x00F0) >>> 4).toByte
+  private def getOpCodeValue(opCode: Short): UByte          = UByte.of(opCode & 0x00FF)
 
   private def executeOpCode(opCode: Short): Unit = opCode & 0xF000 match {
     case 0x0000 => opCode0XXX(opCode)
@@ -77,9 +62,7 @@ class Cpu(memory: Memory, graphicMemory: GraphicMemory, keyDispatcher: KeyDispat
   }
 
   // 00E0: Clears the screen.
-  private def opCode00E0(): Unit = {
-    graphicMemory.clear()
-  }
+  private def opCode00E0(): Unit = graphicMemory.clear()
 
   // 00EE: Returns from a subroutine.
   def opCode00EE(): Unit = {
@@ -88,9 +71,7 @@ class Cpu(memory: Memory, graphicMemory: GraphicMemory, keyDispatcher: KeyDispat
   }
 
   // 1NNN: Jumps to address NNN.
-  private def opCode1NNN(opCode: Short): Unit = {
-    programCounter = getOpCodeAddressValue(opCode)
-  }
+  private def opCode1NNN(opCode: Short): Unit = programCounter = getOpCodeAddressValue(opCode)
 
   // 2NNN: Calls subroutine at NNN.
   def opCode2NNN(opCode: Short): Unit = {
@@ -196,7 +177,7 @@ class Cpu(memory: Memory, graphicMemory: GraphicMemory, keyDispatcher: KeyDispat
         registerYValue - registerXValue
       // 8XYE: Stores the most significant bit of VX in VF and then shifts VX to the left by 1.
       case 0x000E =>
-        registers(0xF) = (registerXValue & UByte.of(0x80.toByte)) >>> 7
+        registers(0xF) = (registerXValue & UByte.of(0x80)) >>> 7
         registerXValue << 1
     }
   }
@@ -228,7 +209,7 @@ class Cpu(memory: Memory, graphicMemory: GraphicMemory, keyDispatcher: KeyDispat
     val registerXNumber = getOpCodeXRegisterNumber(opCode)
     val value           = getOpCodeValue(opCode)
 
-    registers(registerXNumber) = UByte.of((Random.nextInt(256) & value.getValue).toByte)
+    registers(registerXNumber) = UByte.of(Random.nextInt(256) & value.getValue)
   }
 
   // DXYN: Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels and a height of N pixels.

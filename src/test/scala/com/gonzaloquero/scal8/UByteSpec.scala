@@ -6,7 +6,7 @@ import org.scalatest._
 class UByteSpec extends FlatSpec with Matchers {
   "getValue" should "return the value of the UByte" in {
     val a: UByte = UByte.of(1)
-    a.getValue should be(1.toByte)
+    a.getValue should be(1)
   }
 
   "equals" should "return true for two UBytes of the same value" in {
@@ -33,7 +33,7 @@ class UByteSpec extends FlatSpec with Matchers {
 
   "compare" should "return -1 between a value that would be over the sign and a lesser value" in {
     val a: UByte = UByte.of(1)
-    val b: UByte = UByte.of(0xFF.toByte) // Could be 255 or -128
+    val b: UByte = UByte.of(0xFF) // Could be 255 or -128
 
     a.compare(b) should be(-1)
   }
@@ -46,15 +46,15 @@ class UByteSpec extends FlatSpec with Matchers {
   }
 
   "compare" should "return 1 between a value that would be over the sign and a lesser value" in {
-    val a: UByte = UByte.of(0xFF.toByte) // Could be 255 or -128
+    val a: UByte = UByte.of(0xFF) // Could be 255 or -128
     val b: UByte = UByte.of(1)
 
     a.compare(b) should be(1)
   }
 
   "compare" should "return 1 between a value that would be over the sign and a lesser value (2)" in {
-    val a: UByte = UByte.of(0xFF.toByte) // Could be 255 or -128
-    val b: UByte = UByte.of(0xFE.toByte)
+    val a: UByte = UByte.of(0xFF) // Could be 255 or -128
+    val b: UByte = UByte.of(0xFE)
 
     a.compare(b) should be(1)
   }
@@ -67,10 +67,10 @@ class UByteSpec extends FlatSpec with Matchers {
   }
 
   "-" should "calculate a - b for values over the sign change" in {
-    val a: UByte = UByte.of(0xFF.toByte)
+    val a: UByte = UByte.of(0xFF)
     val b: UByte = UByte.of(1)
 
-    (a - b) should be(UByte.of(0xFE.toByte))
+    (a - b) should be(UByte.of(0xFE))
   }
 
   "+" should "calculate a + b" in {
@@ -81,7 +81,7 @@ class UByteSpec extends FlatSpec with Matchers {
   }
 
   "+" should "overflow a + b" in {
-    val a: UByte = UByte.of(0xFF.toByte)
+    val a: UByte = UByte.of(0xFF)
     val b: UByte = UByte.of(1)
 
     (a + b) should be(UByte.of(0))
@@ -121,15 +121,15 @@ class UByteSpec extends FlatSpec with Matchers {
   }
 
   ">>>" should "shift a >>> x (3)" in {
-    val a: UByte = UByte.of(0xFF.toByte)
+    val a: UByte = UByte.of(0xFF)
 
-    (a >>> 1) should be(UByte.of(0x7F.toByte)) // 1 bit shift is equivalent to dividing by 2
+    (a >>> 1) should be(UByte.of(0x7F)) // 1 bit shift is equivalent to dividing by 2
   }
 
   ">>>" should "shift a >>> x (4)" in {
-    val a: UByte = UByte.of(0xFF.toByte)
+    val a: UByte = UByte.of(0xFF)
 
-    (a >>> 2) should be(UByte.of(0x3F.toByte)) // 1 bit shift is equivalent to dividing by 2
+    (a >>> 2) should be(UByte.of(0x3F)) // 1 bit shift is equivalent to dividing by 2
   }
 
   "<<" should "shift a << x" in {
