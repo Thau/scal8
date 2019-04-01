@@ -1,6 +1,5 @@
 package com.gonzaloquero.scal8
 
-import scalafx.event.Event
 import scalafx.scene.input.{KeyCode, KeyEvent}
 
 object FXKeyDispatcher extends KeyDispatcher {
@@ -25,23 +24,12 @@ object FXKeyDispatcher extends KeyDispatcher {
 
   val pressedKeys: Array[Boolean] = Array.ofDim(0xF)
 
-  def dispatchKeyEvent(ge: Event): Unit = {
-    val e: KeyEvent = ge.asInstanceOf[KeyEvent]
-
-    if (!keyEquivalences.contains(e.code)) {
-      return
-    }
-
-    e.eventType match {
-      case KeyEvent.KeyPressed =>
-        pressedKeys(keyEquivalences(e.code) - 1) = true
-      case KeyEvent.KeyReleased =>
-        pressedKeys(keyEquivalences(e.code) - 1) = false
-      case _ => ()
-    }
+  def dispatchKeyEvent(ge: KeyEvent): Unit = ge match {
+    case ge if !keyEquivalences.contains(ge.code)   => ()
+    case ge if ge.eventType == KeyEvent.KeyPressed  => pressedKeys(keyEquivalences(ge.code) - 1) = true
+    case ge if ge.eventType == KeyEvent.KeyReleased => pressedKeys(keyEquivalences(ge.code) - 1) = false
+    case _                                          => ()
   }
 
-  def isPressed(code: Byte): Boolean = {
-    pressedKeys(code - 1)
-  }
+  def isPressed(code: Byte): Boolean = pressedKeys(code - 1)
 }

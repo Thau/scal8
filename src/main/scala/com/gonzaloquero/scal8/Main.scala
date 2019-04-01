@@ -57,30 +57,29 @@ object Main extends JFXApp {
       FXKeyDispatcher.dispatchKeyEvent(ke)
     }
 
-    AnimationTimer(_ => {
-      render()
-    }).start()
+    AnimationTimer(_ => render()).start()
+  }
+
+  private def paintPixel(x: Int, y: Int, color: Color): Unit = {
+    val gc = canvas.graphicsContext2D
+
+    val dx = 4
+    val dy = 4
+
+    val x1 = x * dx
+    val y1 = y * dy
+    val x2 = (x1 + 4) * dx
+    val y2 = (y1 + 4) * dy
+
+    gc.setFill(color)
+
+    gc.fillRect(x1, y1, x2 - x1, y2 - y1)
   }
 
   private def render(): Unit = {
-    val dx = 4
-    val dy = 4
-    val gc = canvas.graphicsContext2D
-
-    for {
-      x <- 0 until graphicMemory.width
-      y <- 0 until graphicMemory.height
-      x1 = x * dx
-      y1 = y * dy
-      x2 = (x1 + 4) * dx
-      y2 = (y1 + 4) * dy
-    } {
-      if (graphicMemory.get(x, y)) {
-        gc.setFill(Color.White)
-      } else {
-        gc.setFill(Color.Black)
-      }
-      gc.fillRect(x1, y1, x2 - x1, y2 - y1)
+    graphicMemory.foreach {
+      case (x, y, true)  => paintPixel(x, y, Color.White)
+      case (x, y, false) => paintPixel(x, y, Color.Black)
     }
   }
 
@@ -90,7 +89,7 @@ object Main extends JFXApp {
       Stream
         .continually(bis.read)
         .takeWhile(b => b != -1)
-        .map(b => UByte.of(b.toByte))
+        .map(UByte.of)
     )
   }
 }
