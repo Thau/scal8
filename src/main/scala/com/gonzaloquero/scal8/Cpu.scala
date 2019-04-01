@@ -49,35 +49,31 @@ class Cpu(memory: Memory, graphicMemory: GraphicMemory, keyDispatcher: KeyDispat
     UByte.of((opCode & 0x00FF).toByte)
   }
 
-  private def executeOpCode(opCode: Short): Unit = {
-    opCode & 0xF000 match {
-      case 0x0000 => opCode0XXX(opCode)
-      case 0x1000 => opCode1NNN(opCode)
-      case 0x2000 => opCode2NNN(opCode)
-      case 0x3000 => opCode3XNN(opCode)
-      case 0x4000 => opCode4XNN(opCode)
-      case 0x5000 => opCode5XY0(opCode)
-      case 0x6000 => opCode6XNN(opCode)
-      case 0x7000 => opCode7XNN(opCode)
-      case 0x8000 => opCode8XYN(opCode)
-      case 0x9000 => opCode9XY0(opCode)
-      case 0xA000 => opCodeANNN(opCode)
-      case 0xB000 => opCodeBNNN(opCode)
-      case 0xC000 => opCodeCXNN(opCode)
-      case 0xD000 => opCodeDXYN(opCode)
-      case 0xE000 => opCodeEXNN(opCode)
-      case 0xF000 => opCodeFXNN(opCode)
-      case _      => println(f"OpCode $opCode%x not implemented")
-    }
+  private def executeOpCode(opCode: Short): Unit = opCode & 0xF000 match {
+    case 0x0000 => opCode0XXX(opCode)
+    case 0x1000 => opCode1NNN(opCode)
+    case 0x2000 => opCode2NNN(opCode)
+    case 0x3000 => opCode3XNN(opCode)
+    case 0x4000 => opCode4XNN(opCode)
+    case 0x5000 => opCode5XY0(opCode)
+    case 0x6000 => opCode6XNN(opCode)
+    case 0x7000 => opCode7XNN(opCode)
+    case 0x8000 => opCode8XYN(opCode)
+    case 0x9000 => opCode9XY0(opCode)
+    case 0xA000 => opCodeANNN(opCode)
+    case 0xB000 => opCodeBNNN(opCode)
+    case 0xC000 => opCodeCXNN(opCode)
+    case 0xD000 => opCodeDXYN(opCode)
+    case 0xE000 => opCodeEXNN(opCode)
+    case 0xF000 => opCodeFXNN(opCode)
+    case _      => println(f"OpCode $opCode%x not implemented")
   }
 
-  private def opCode0XXX(opCode: Short): Unit = {
-    opCode match {
-      case 0x00E0 => opCode00E0()
-      case 0x00EE => opCode00EE()
-      case 0x0000 => () // Noop
-      case _      => println(f"OpCode 0XXX $opCode%x not implemented")
-    }
+  private def opCode0XXX(opCode: Short): Unit = opCode match {
+    case 0x00E0 => opCode00E0()
+    case 0x00EE => opCode00EE()
+    case 0x0000 => () // Noop
+    case _      => println(f"OpCode 0XXX $opCode%x not implemented")
   }
 
   // 00E0: Clears the screen.
@@ -265,11 +261,9 @@ class Cpu(memory: Memory, graphicMemory: GraphicMemory, keyDispatcher: KeyDispat
   }
 
   // EXNN: Keyboard operations
-  def opCodeEXNN(opCode: Short): Unit = {
-    opCode & 0x00FF match {
-      case 0x009E => opCodeEX9E(opCode)
-      case 0x00A1 => opCodeEXA1(opCode)
-    }
+  def opCodeEXNN(opCode: Short): Unit = opCode & 0x00FF match {
+    case 0x009E => opCodeEX9E(opCode)
+    case 0x00A1 => opCodeEXA1(opCode)
   }
 
   // EX9E: Skips the next instruction if the key stored in VX is pressed.
