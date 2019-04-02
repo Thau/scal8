@@ -89,7 +89,7 @@ object Main extends JFXApp {
       Stream
         .continually(bis.read)
         .takeWhile(b => b != -1)
-        .map(UByte.of)
+        .map(UByte.apply)
     )
   }
 }
