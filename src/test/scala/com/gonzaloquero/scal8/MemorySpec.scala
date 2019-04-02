@@ -8,7 +8,7 @@ class MemorySpec extends FlatSpec with Matchers {
     val memory = Memory.withProgram(Array[UByte]())
 
     for (i <- 0 until 0xFFF) {
-      memory.get(i) should be(UByte.of(0))
+      memory.get(i) should be(UByte(0))
     }
   }
 
@@ -22,23 +22,23 @@ class MemorySpec extends FlatSpec with Matchers {
       ))
 
     for (i <- 0 until 0x200) {
-      memory.get(i) should be(UByte.of(0))
+      memory.get(i) should be(UByte(0))
     }
 
-    memory.get(0x200) should be(UByte.of(0x00))
-    memory.get(0x201) should be(UByte.of(0xE0))
-    memory.get(0x202) should be(UByte.of(0xA2))
-    memory.get(0x203) should be(UByte.of(0x48))
+    memory.get(0x200) should be(UByte(0x00))
+    memory.get(0x201) should be(UByte(0xE0))
+    memory.get(0x202) should be(UByte(0xA2))
+    memory.get(0x203) should be(UByte(0x48))
   }
 
   "get" should "return the value in the correspondent memory address" in {
     val memory = Memory.withProgram(Array[UByte](0x48))
-    memory.get(0x200) should be(UByte.of(0x48))
+    memory.get(0x200) should be(UByte(0x48))
   }
 
   "set" should "change the value of the memory address" in {
     val memory = Memory.withProgram(Array[UByte]())
     memory.set(0x200, 0x48)
-    memory.get(0x200) should be(UByte.of(0x48))
+    memory.get(0x200) should be(UByte(0x48))
   }
 }

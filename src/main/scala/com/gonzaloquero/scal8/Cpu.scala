@@ -7,7 +7,7 @@ class Cpu(memory: Memory, graphicMemory: GraphicMemory, keyDispatcher: KeyDispat
   var programCounter: Short   = 0x200
   var stack: List[Short]      = List()
   val registers: Array[UByte] = new Array[UByte](16)
-  var delayTimer: UByte       = UByte.of(0)
+  var delayTimer: UByte       = UByte(0)
 
   def tick(): Unit = {
     val opCode = getNextOpCode
@@ -15,8 +15,8 @@ class Cpu(memory: Memory, graphicMemory: GraphicMemory, keyDispatcher: KeyDispat
   }
 
   def clockTick(): Unit = {
-    if (delayTimer > UByte.of(0)) {
-      delayTimer = delayTimer - UByte.of(1)
+    if (delayTimer > UByte(0)) {
+      delayTimer = delayTimer - UByte(1)
     }
   }
 
@@ -32,7 +32,7 @@ class Cpu(memory: Memory, graphicMemory: GraphicMemory, keyDispatcher: KeyDispat
   private def getOpCodeAddressValue(opCode: Short)          = (opCode & 0x0FFF).toShort
   private def getOpCodeXRegisterNumber(opCode: Short): Byte = ((opCode & 0x0F00) >>> 8).toByte
   private def getOpCodeYRegisterNumber(opCode: Short): Byte = ((opCode & 0x00F0) >>> 4).toByte
-  private def getOpCodeValue(opCode: Short): UByte          = UByte.of(opCode & 0x00FF)
+  private def getOpCodeValue(opCode: Short): UByte          = UByte(opCode & 0x00FF)
 
   private def executeOpCode(opCode: Short): Unit = opCode & 0xF000 match {
     case 0x0000 => opCode0XXX(opCode)
@@ -147,37 +147,37 @@ class Cpu(memory: Memory, graphicMemory: GraphicMemory, keyDispatcher: KeyDispat
 
         // TODO: This feels terrible. There has to be a better way.
         if ((0x00FF & registerXValue.getValue) + (0x0FF & registerYValue.getValue) > 0xFF) {
-          registers(0xF) = UByte.of(1)
+          registers(0xF) = UByte(1)
         } else {
-          registers(0xF) = UByte.of(0)
+          registers(0xF) = UByte(0)
         }
 
         result
       // 8XY5: VY is subtracted from VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
       case 0x0005 =>
         registers(0xF) = if (registerXValue > registerYValue) {
-          UByte.of(1)
+          UByte(1)
         } else {
-          UByte.of(0)
+          UByte(0)
         }
 
         registerXValue - registerYValue
       // 8XY6: Stores the least significant bit of VX in VF and then shifts VX to the right by 1.
       case 0x0006 =>
-        registers(0xF) = registerXValue & UByte.of(0x0001)
+        registers(0xF) = registerXValue & UByte(0x0001)
         registerXValue >>> 1
       // 8XY7: Sets VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
       case 0x0007 =>
         registers(0xF) = if (registerYValue > registerXValue) {
-          UByte.of(1)
+          UByte(1)
         } else {
-          UByte.of(0)
+          UByte(0)
         }
 
         registerYValue - registerXValue
       // 8XYE: Stores the most significant bit of VX in VF and then shifts VX to the left by 1.
       case 0x000E =>
-        registers(0xF) = (registerXValue & UByte.of(0x80)) >>> 7
+        registers(0xF) = (registerXValue & UByte(0x80)) >>> 7
         registerXValue << 1
     }
   }
@@ -209,7 +209,7 @@ class Cpu(memory: Memory, graphicMemory: GraphicMemory, keyDispatcher: KeyDispat
     val registerXNumber = getOpCodeXRegisterNumber(opCode)
     val value           = getOpCodeValue(opCode)
 
-    registers(registerXNumber) = UByte.of(Random.nextInt(256) & value.getValue)
+    registers(registerXNumber) = UByte(Random.nextInt(256) & value.getValue)
   }
 
   // DXYN: Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels and a height of N pixels.
@@ -220,7 +220,7 @@ class Cpu(memory: Memory, graphicMemory: GraphicMemory, keyDispatcher: KeyDispat
     val x               = Math.max(0, registers(registerXNumber).getValue)
     val y               = Math.max(0, registers(registerYNumber).getValue)
 
-    registers(0xF) = UByte.of(0)
+    registers(0xF) = UByte(0)
 
     var offsetY = 0
     for (dy <- y until (y + height)) {
@@ -235,7 +235,7 @@ class Cpu(memory: Memory, graphicMemory: GraphicMemory, keyDispatcher: KeyDispat
         val currentValue = graphicMemory.get(wrappedX, wrappedY)
         val bit          = if ((((newValue << dx) & 0x80) >>> 7) == 0) false else true
 
-        registers(0xF) = if (currentValue && !bit) { UByte.of(1) } else { registers(0xF) }
+        registers(0xF) = if (currentValue && !bit) { UByte(1) } else { registers(0xF) }
         graphicMemory.set(wrappedX, wrappedY, currentValue ^ bit)
       }
     }
