@@ -6,7 +6,7 @@ class Cpu(memory: Memory, graphicMemory: GraphicMemory, keyDispatcher: KeyDispat
   var addressI: Short         = 0
   var programCounter: Short   = 0x200
   var stack: List[Short]      = List()
-  val registers: Array[UByte] = new Array[UByte](16)
+  val registers: Array[UByte] = (0 until 16).map(_ => UByte(0)).toArray
   var delayTimer: UByte       = UByte(0)
 
   def tick(): Unit = {
@@ -21,8 +21,8 @@ class Cpu(memory: Memory, graphicMemory: GraphicMemory, keyDispatcher: KeyDispat
   }
 
   private def getNextOpCode: Short = {
-    val firstPart  = memory.get(programCounter).getValue << 8
-    val secondPart = memory.get(programCounter + 1).getValue & 0x00FF
+    val firstPart  = memory.get(programCounter).value << 8
+    val secondPart = memory.get(programCounter + 1).value & 0x00FF
 
     advanceProgramCounter()
     ((firstPart | secondPart).toShort & 0x0000FFFF).toShort
@@ -146,7 +146,7 @@ class Cpu(memory: Memory, graphicMemory: GraphicMemory, keyDispatcher: KeyDispat
         val result = registerXValue + registerYValue
 
         // TODO: This feels terrible. There has to be a better way.
-        if ((0x00FF & registerXValue.getValue) + (0x0FF & registerYValue.getValue) > 0xFF) {
+        if ((0x00FF & registerXValue.value) + (0x0FF & registerYValue.value) > 0xFF) {
           registers(0xF) = UByte(1)
         } else {
           registers(0xF) = UByte(0)
@@ -200,7 +200,7 @@ class Cpu(memory: Memory, graphicMemory: GraphicMemory, keyDispatcher: KeyDispat
   // BNNN: Jumps to the address NNN plus V0.
   def opCodeBNNN(opCode: Short): Unit = {
     val address = getOpCodeAddressValue(opCode)
-    programCounter = (registers(0).getValue + address).toShort
+    programCounter = (registers(0).value + address).toShort
   }
 
   // CXNN: Sets VX to the result of a bitwise and operation on a random number (Typically: 0 to 255) and NN.
@@ -209,7 +209,7 @@ class Cpu(memory: Memory, graphicMemory: GraphicMemory, keyDispatcher: KeyDispat
     val registerXNumber = getOpCodeXRegisterNumber(opCode)
     val value           = getOpCodeValue(opCode)
 
-    registers(registerXNumber) = UByte(Random.nextInt(256) & value.getValue)
+    registers(registerXNumber) = UByte(Random.nextInt(256) & value.value)
   }
 
   // DXYN: Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels and a height of N pixels.
@@ -217,15 +217,15 @@ class Cpu(memory: Memory, graphicMemory: GraphicMemory, keyDispatcher: KeyDispat
     val registerXNumber = getOpCodeXRegisterNumber(opCode)
     val registerYNumber = getOpCodeYRegisterNumber(opCode)
     val height          = opCode & 0x00F
-    val x               = Math.max(0, registers(registerXNumber).getValue)
-    val y               = Math.max(0, registers(registerYNumber).getValue)
+    val x               = Math.max(0, registers(registerXNumber).value)
+    val y               = Math.max(0, registers(registerYNumber).value)
 
     registers(0xF) = UByte(0)
 
     var offsetY = 0
     for (dy <- y until (y + height)) {
 
-      val newValue = memory.get(addressI + offsetY).getValue
+      val newValue = memory.get(addressI + offsetY).value
       offsetY += 1
 
       for (dx <- 0 until 8) {
@@ -252,7 +252,7 @@ class Cpu(memory: Memory, graphicMemory: GraphicMemory, keyDispatcher: KeyDispat
     val registerNumber = getOpCodeXRegisterNumber(opCode)
     val key            = registers(registerNumber)
 
-    if (keyDispatcher.isPressed(key.getValue)) {
+    if (keyDispatcher.isPressed(key.value)) {
       advanceProgramCounter()
     }
   }
@@ -262,7 +262,7 @@ class Cpu(memory: Memory, graphicMemory: GraphicMemory, keyDispatcher: KeyDispat
     val registerNumber = getOpCodeXRegisterNumber(opCode)
     val key            = registers(registerNumber)
 
-    if (!keyDispatcher.isPressed(key.getValue)) {
+    if (!keyDispatcher.isPressed(key.value)) {
       advanceProgramCounter()
     }
   }
@@ -273,7 +273,7 @@ class Cpu(memory: Memory, graphicMemory: GraphicMemory, keyDispatcher: KeyDispat
     val value          = registers(registerNumber)
     val opCodeValue    = getOpCodeValue(opCode)
 
-    opCodeValue.getValue match {
+    opCodeValue.value match {
       // FX07: Sets VX to the value of the delay timer.
       case 0x0007 => registers(registerNumber) = delayTimer
       // TODO FX0A: A key press is awaited, and then stored in VX. (Blocking Operation. All instruction halted until next key event)
@@ -281,7 +281,7 @@ class Cpu(memory: Memory, graphicMemory: GraphicMemory, keyDispatcher: KeyDispat
       case 0x0015 => delayTimer = value
       // TODO FX18: Sets the sound timer to VX.
       // FX1E: Adds VX to I.
-      case 0x001E => addressI = (addressI + value.getValue).toShort
+      case 0x001E => addressI = (addressI + value.value).toShort
       // TODO FX29: Sets I to the location of the sprite for the character in VX. Characters 0-F (in hexadecimal) are represented by a 4x5 font.
       // TODO FX33: Stores the binary-coded decimal representation of VX.
       // FX55: Stores V0 to VX (including VX) in memory starting at address I. The offset from I is increased by 1 for each value written, but I itself is left unmodified.
