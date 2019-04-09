@@ -4,9 +4,9 @@ import com.gonzaloquero.scal8.UByteImplicits._
 import org.scalatest._
 
 class UByteSpec extends FlatSpec with Matchers {
-  "getValue" should "return the value of the UByte" in {
+  "value" should "return the value of the UByte" in {
     val a: UByte = UByte(1)
-    a.getValue should be(1)
+    a.value should be(1)
   }
 
   "equals" should "return true for two UBytes of the same value" in {
